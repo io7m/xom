@@ -60,7 +60,24 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+    <!-- Plugin versions -->
+    <xom.build-helper-maven-plugin.version>3.0.0</xom.build-helper-maven-plugin.version>
+    <xom.maven-project-info-reports-plugin.version>2.9</xom.maven-project-info-reports-plugin.version>
+    <xom.maven-site-plugin.version>3.5.1</xom.maven-site-plugin.version>
+    <xom.maven-compiler-plugin.version>3.7.0</xom.maven-compiler-plugin.version>
+    <xom.maven-javadoc-plugin.version>3.0.0</xom.maven-javadoc-plugin.version>
+    <xom.maven-source-plugin.version>3.0.0</xom.maven-source-plugin.version>
+    <xom.maven-bundle-plugin.version>3.2.0</xom.maven-bundle-plugin.version>
+    <xom.maven-resources-plugin.version>3.0.2</xom.maven-resources-plugin.version>
+    <xom.docbkx-maven-plugin.version>2.0.17</xom.docbkx-maven-plugin.version>
+    <xom.nexus-staging-maven-plugin.version>1.6.7</xom.nexus-staging-maven-plugin.version>
+    <xom.maven-enforcer-plugin.version>3.0.0-M1</xom.maven-enforcer-plugin.version>
   </properties>
+
+  <prerequisites>
+    <maven>3.5.0</maven>
+  </prerequisites>
 
   <dependencies>
     <dependency>
@@ -119,17 +136,22 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>build-helper-maven-plugin</artifactId>
-          <version>3.0.0</version>
+          <version>${xom.build-helper-maven-plugin.version}</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-project-info-reports-plugin</artifactId>
-          <version>2.9</version>
+          <version>${xom.maven-project-info-reports-plugin.version}</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
-          <version>3.3</version>
+          <version>${xom.maven-site-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.20.1</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -155,14 +177,39 @@
         </executions>
       </plugin>
 
-      <!-- Require JDK >= 1.2 -->
+      <!-- Check various preconditions for building. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>${xom.maven-enforcer-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>enforce-rules</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <!-- Require JDK 9+ -->
+                <requireJavaVersion>
+                  <version>[9,)</version>
+                </requireJavaVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Produce JDK 6 bytecode -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.5.1</version>
+        <version>${xom.maven-compiler-plugin.version}</version>
         <configuration>
-          <source>1.2</source>
-          <target>1.2</target>
+          <source>6</source>
+          <target>6</target>
+          <release>6</release>
         </configuration>
       </plugin>
 
@@ -170,7 +217,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.10.3</version>
+        <version>${xom.maven-javadoc-plugin.version}</version>
         <executions>
           <execution>
             <id>attach-javadocs</id>
@@ -203,7 +250,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>${xom.maven-source-plugin.version}</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -232,7 +279,7 @@
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <version>3.2.0</version>
+        <version>${xom.maven-bundle-plugin.version}</version>
         <extensions>true</extensions>
         <configuration>
           <archive>
@@ -304,6 +351,8 @@
             <Bundle-Vendor>xom.nu</Bundle-Vendor>
             <Bundle-RequiredExecutionEnvironment>J2SE-1.2</Bundle-RequiredExecutionEnvironment>
 
+            <Automatic-Module-Name>nu.xom</Automatic-Module-Name>
+
             <Import-Package>
               com.sun.org.apache.xerces.internal.jaxp;    resolution:="optional",
               com.sun.org.apache.xerces.internal.parsers; resolution:="optional",
@@ -327,7 +376,7 @@
       <!-- Copy resources needed to produce the web site -->
       <plugin>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>3.0.2</version>
+        <version>${xom.maven-resources-plugin.version}</version>
         <executions>
           <execution>
             <id>copy-resources</id>
@@ -358,7 +407,7 @@
       <plugin>
         <groupId>com.agilejava.docbkx</groupId>
         <artifactId>docbkx-maven-plugin</artifactId>
-        <version>2.0.17</version>
+        <version>${xom.docbkx-maven-plugin.version}</version>
         <dependencies>
           <dependency>
             <groupId>org.docbook</groupId>
@@ -387,7 +436,7 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.7</version>
+        <version>${xom.nexus-staging-maven-plugin.version}</version>
         <extensions>true</extensions>
         <configuration>
           <serverId>sonatype-nexus-staging</serverId>
@@ -411,7 +460,7 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>build-helper-maven-plugin</artifactId>
-            <version>3.0.0</version>
+            <version>${xom.build-helper-maven-plugin.version}</version>
             <executions>
               <execution>
                 <id>add-fat-sources</id>
@@ -453,37 +502,6 @@
                 <configuration>
                   <sources>
                     <source>src/main/java-fat</source>
-                  </sources>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <!-- Include JDK <= 1.5 sources on old JDK releases. -->
-    <profile>
-      <id>nu.xom.jdk15</id>
-      <activation>
-        <jdk>[1.0, 1.6)</jdk>
-      </activation>
-      <build>
-        <plugins>
-          <!-- Add an extra source directory for JDK 1.5 -->
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>add-jdk15-sources</id>
-                <phase>generate-sources</phase>
-                <goals>
-                  <goal>add-source</goal>
-                </goals>
-                <configuration>
-                  <sources>
-                    <source>src/main/java-jdk15</source>
                   </sources>
                 </configuration>
               </execution>
